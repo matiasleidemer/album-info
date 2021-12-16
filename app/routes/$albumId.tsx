@@ -2,79 +2,90 @@ import invariant from "tiny-invariant";
 import { useLoaderData } from "remix";
 import type { MetaFunction, LoaderFunction } from "remix";
 
-import { getCredentials, getAccessToken, getAlbum } from "~/lib/spotify.server";
+import { getCredentials, getAccessToken, client } from "~/lib/spotify.server";
 
 export const loader: LoaderFunction = async ({ params: { albumId } }) => {
   invariant(typeof albumId === "string", "invalid album id");
 
   const [clientId, clientSecret] = getCredentials();
-
   const accessToken = await getAccessToken(clientId, clientSecret);
-  const album = await getAlbum({ albumId, accessToken });
+  const spotifyClient = client(accessToken);
 
-  return album;
+  const album = await spotifyClient.getAlbum(albumId);
+  const artist = await spotifyClient.getArtist(album.artists[0].id);
+
+  return { album, artist };
 };
 
 export const meta: MetaFunction = ({ data }) => {
+  const { artist, album } = data;
+
   return {
-    title: `${data.name} by ${data.artists[0].name}`,
-    description: `Get to know ${data.name} a little bit better`,
-    "twitter:image": data.images[0].url,
+    title: `${album.name} by ${artist.name}`,
+    description: `Get to know ${album.name} a little bit better`,
+    "twitter:image": album.images[0].url,
     "twitter:card": "summary_large_image",
   };
 };
 
 const formatLength = (ms: number) => {
   const date = new Date(ms);
-  const minutes = `0${date.getMinutes()}`.slice(-2);
-  const seconds = `0${date.getSeconds()}`.slice(-2);
 
-  return `${minutes}:${seconds}`;
+  const hours = parseInt(`0${date.getUTCHours()}`.slice(-2));
+  const minutes = parseInt(`0${date.getMinutes()}`.slice(-2));
+  const seconds = parseInt(`0${date.getSeconds()}`.slice(-2));
+
+  if (hours > 0) return `${hours} hr ${minutes} min`;
+
+  return `${minutes} min ${seconds} sec`;
 };
 
 export default function Index() {
   let data = useLoaderData();
+  const { album, artist } = data;
 
-  const cover = data.images[0];
-  const artist = data.artists[0];
+  const cover = album.images[0];
+  const tracks = album.tracks.items;
+
+  const totalTime = tracks.reduce((sum, track) => {
+    sum += track.duration_ms;
+    return sum;
+  }, 0);
+
+  const releasedAt = new Date(Date.parse(album.release_date));
+
+  const Bullet = () => <span>•</span>;
 
   return (
     <>
       <header className="mb-16">
-        <h1 className="text-5xl text-center font-extrabold">Album Info</h1>
+        {/* <h1 className="text-5xl text-center font-extrabold">Album Info</h1> */}
       </header>
 
-      <main className="container mx-auto p-4">
-        <div className="flex flex-col gap-4 md:flex-row">
-          <div className="flex-1">
-            <img
-              src={cover.url}
-              width={cover.width}
-              height={cover.height}
-              className="mb-4"
-            />
-            <p>
-              {data.name} <span>by</span> {artist.name}
-            </p>
-            <p>
-              Released on {data.release_date} via {data.label}
-            </p>
-            <p>
-              Spotify URL:{" "}
-              <a href={data.href} target="_blank">
-                {data.href}
-              </a>
-            </p>
-          </div>
-          <div className="flex-1">
-            <h2 className="mb-4">Tracklist</h2>
-            <ul>
-              {data.tracks.items.map((track) => (
-                <li>
-                  {track.name} ({formatLength(track.duration_ms)})
-                </li>
-              ))}
-            </ul>
+      <main className="container mx-auto p-4 flex justify-center">
+        <div className="flex gap-6">
+          <img
+            src={cover.url}
+            width={232}
+            height={232}
+            className={`mb-4 shadow-xl rounded`}
+          />
+          <div className="self-end pb-4">
+            <p className="uppercase text-xs font-bold">{album.album_type}</p>
+            <h2 className="text-8xl font-extrabold py-2">{album.name}</h2>
+            <div className="flex items-center gap-1 text-sm">
+              <img
+                src={artist.images[0].url}
+                className="rounded-full w-6 h-6"
+              />
+              <span className="font-bold">{artist.name}</span>
+              <Bullet />
+              <span>{releasedAt.getFullYear()}</span>
+              <Bullet />
+              <span>
+                {tracks.length} songs, {formatLength(totalTime)}
+              </span>
+            </div>
           </div>
         </div>
       </main>

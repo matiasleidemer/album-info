@@ -40,15 +40,28 @@ export const getAccessToken = async (
   return data.access_token;
 };
 
-export const getAlbum = async ({
-  albumId,
+export const client = (accessToken: string) => {
+  return {
+    getAlbum: (id: string) =>
+      get({
+        uri: `https://api.spotify.com/v1/albums/${id}?market=US`,
+        accessToken,
+      }),
+    getArtist: (id: string) =>
+      get({
+        uri: `https://api.spotify.com/v1/artists/${id}?market=US`,
+        accessToken,
+      }),
+  };
+};
+
+const get = async ({
+  uri,
   accessToken,
 }: {
-  albumId: string;
+  uri: string;
   accessToken: string;
 }) => {
-  const uri = `https://api.spotify.com/v1/albums/${albumId}?market=US`;
-
   const method = "get";
   const headers = {
     Authorization: `Bearer ${accessToken}`,
