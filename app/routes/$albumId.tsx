@@ -42,7 +42,7 @@ const formatLength = (ms: number) => {
   return `${minutes} min ${seconds} sec`
 }
 
-export default function Index () {
+export default function Index() {
   const data = useLoaderData()
 
   const {
@@ -65,23 +65,23 @@ export default function Index () {
 
   return (
     <>
-      <main className='container mx-auto p-4 my-16 flex justify-center'>
-        <div className='flex gap-6'>
+      <main className="container mx-auto p-4 my-16 flex justify-center">
+        <div className="flex gap-6">
           <img
             src={cover.url}
             width={232}
             height={232}
-            className='mb-4 rounded shadow-lg'
+            className="mb-4 rounded shadow-lg"
           />
-          <div className='self-end pb-4'>
-            <p className='uppercase text-xs font-bold'>{album.album_type}</p>
-            <h2 className='text-8xl font-extrabold py-2'>{album.name}</h2>
-            <div className='flex items-center gap-1 text-sm'>
+          <div className="self-end pb-4">
+            <p className="uppercase text-xs font-bold">{album.album_type}</p>
+            <h2 className="text-8xl font-extrabold py-2">{album.name}</h2>
+            <div className="flex items-center gap-1 text-sm">
               <img
                 src={artist.images[0].url}
-                className='rounded-full w-6 h-6'
+                className="rounded-full w-6 h-6"
               />
-              <span className='font-bold'>{artist.name}</span>
+              <span className="font-bold">{artist.name}</span>
               <Bullet />
               <span>{releasedAt.getFullYear()}</span>
               <Bullet />

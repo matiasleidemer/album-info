@@ -10,6 +10,6 @@ export const getDominantColor = async (imageUrl: string) => {
   return dominant
 }
 
-const rgbToHex = ({ r, g, b }: { r: number, g: number, b: number }) => {
+const rgbToHex = ({ r, g, b }: { r: number; g: number; b: number }) => {
   return '#' + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)
 }

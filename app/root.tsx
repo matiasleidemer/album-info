@@ -4,13 +4,13 @@ import {
   Meta,
   Outlet,
   ScrollRestoration,
-  useCatch,
-} from "remix";
+  useCatch
+} from 'remix'
 
-import styles from "./tailwind.css";
+import styles from './tailwind.css'
 
 export function links() {
-  return [{ rel: "stylesheet", href: styles }];
+  return [{ rel: 'stylesheet', href: styles }]
 }
 
 export default function App() {
@@ -20,7 +20,7 @@ export default function App() {
         <Outlet />
       </Layout>
     </Document>
-  );
+  )
 }
 
 export function ErrorBoundary({ error }: { error: Error }) {
@@ -38,13 +38,13 @@ export function ErrorBoundary({ error }: { error: Error }) {
         </div>
       </Layout>
     </Document>
-  );
+  )
 }
 
 export function CatchBoundary() {
-  let caught = useCatch();
+  const caught = useCatch()
 
-  let message;
+  let message
   switch (caught.status) {
     case 401:
       message = (
@@ -52,16 +52,16 @@ export function CatchBoundary() {
           Oops! Looks like you tried to visit a page that you do not have access
           to.
         </p>
-      );
-      break;
+      )
+      break
     case 404:
       message = (
         <p>Oops! Looks like you tried to visit a page that does not exist.</p>
-      );
-      break;
+      )
+      break
 
     default:
-      throw new Error(caught.data || caught.statusText);
+      throw new Error(caught.data || caught.statusText)
   }
 
   return (
@@ -73,15 +73,15 @@ export function CatchBoundary() {
         {message}
       </Layout>
     </Document>
-  );
+  )
 }
 
 function Document({
   children,
-  title,
+  title
 }: {
-  children: React.ReactNode;
-  title?: string;
+  children: React.ReactNode
+  title?: string
 }) {
   return (
     <html lang="en">
@@ -95,12 +95,12 @@ function Document({
       <body>
         {children}
         <ScrollRestoration />
-        {process.env.NODE_ENV === "development" && <LiveReload />}
+        {process.env.NODE_ENV === 'development' && <LiveReload />}
       </body>
     </html>
-  );
+  )
 }
 
 function Layout({ children }: { children: React.ReactNode }) {
-  return <div className="w-full">{children}</div>;
+  return <div className="w-full">{children}</div>
 }
