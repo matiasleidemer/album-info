@@ -1,0 +1,6 @@
+node_modules/
+public/
+api/build/
+*.d.ts
+remix.config.js
+tailwind.config.js
